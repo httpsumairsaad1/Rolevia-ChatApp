@@ -1,19 +1,21 @@
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 
-const LoginScreen = () => {
+const ChooseLogin = () => {
+  const navigation= useNavigation()
   return (
     <LinearGradient colors={['#151515', '#17435D']} style={styles.container}>
       {/* Logo */}
-      <Image source={require('./assets/logo-rolevia.png')} style={styles.logo} />
+      <Image source={require('../assets/logo-rolevia.png')} style={styles.logo} />
 
       {/* Login and SignUp Buttons */}
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={[styles.button, { backgroundColor: '#141718' }]}>
+        <TouchableOpacity style={[styles.button, { backgroundColor: '#141718' }]} onPress={()=>{navigation.navigate('Login')}}>
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.button, { backgroundColor: '#82A7BD' }]}>
+        <TouchableOpacity style={[styles.button, { backgroundColor: '#82A7BD' }]} onPress={()=>{navigation.navigate('Signup')}}>
           <Text style={styles.buttonText}>Sign Up</Text>
         </TouchableOpacity>
       </View>
@@ -51,4 +53,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LoginScreen;
+export default ChooseLogin;
