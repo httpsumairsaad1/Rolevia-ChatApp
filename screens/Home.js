@@ -1,230 +1,160 @@
-import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  ActivityIndicator,
-} from 'react-native';
+import React from 'react';
+import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import auth from '@react-native-firebase/auth';
-import Toast from 'react-native-toast-message';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useNavigation } from '@react-navigation/native';
 
-GoogleSignin.configure({
-  webClientId: '983516591273-fgom6uvkkk8urjoeafrp6et120buophh.apps.googleusercontent.com',
-});
+const Home = () => {
+  const navigation = useNavigation(); // Access navigation
 
-const LoginScreen = () => {
-  const navigation = useNavigation();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+  const trendingCharacters = [
+  { 
+    id: 1, 
+    name: 'Hitman', 
+    image: require('../assets/characters/hit-man.png'), 
+    description: 'A skilled assassin known for his stealth and precision.' 
+  },
+  { 
+    id: 2, 
+    name: 'Golden Skull', 
+    image: require('../assets/characters/golden_skull.png'), 
+    description: 'A mysterious figure with a golden skull mask, symbolizing power and enigma.' 
+  },
+  { 
+    id: 3, 
+    name: 'Girl Math', 
+    image: require('../assets/characters/girl_math.png'), 
+    description: 'An intellectual personality specializing in problem-solving and strategies.' 
+  },
+  { 
+    id: 4, 
+    name: 'Kuwait Arab', 
+    image: require('../assets/characters/kuwait_arab.png'), 
+    description: 'A charismatic leader representing Kuwaiti culture and values.' 
+  },
+];
 
-  const handleLogin = async () => {
-    if (!email || !password) {
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'Please fill in all fields.',
-      });
-      return;
-    }
+  const characterList = [
+    { id: 1, name: 'Gym Trainer', description: 'Your gym trainer', image: require('../assets/img1.png') },
+    { id: 2, name: 'Xen Lee', description: 'Chinese Mafia Leader', image: require('../assets/img1.png') },
+    { id: 3, name: 'Zhang Liu', description: 'Chinese Emperor', image: require('../assets/img1.png') },
+  ];
 
-    setLoading(true);
-    try {
-      // Sign in with Firebase
-      await auth().signInWithEmailAndPassword(email, password);
-
-      // Check if the email is verified
-      if (auth().currentUser && !auth().currentUser.emailVerified) {
-        Toast.show({
-          type: 'error',
-          text1: 'Verify Email',
-          text2: 'Please verify your email before logging in.',
-        });
-        setLoading(false);
-        return;
-      }
-
-      // Navigate to the Home screen
-      Toast.show({
-        type: 'success',
-        text1: 'Login Successful!',
-        text2: 'Welcome back!',
-      });
-      
-      navigation.navigate('Home');
-    } catch (error) {
-      // Handle errors
-      if (error.code === 'auth/user-not-found') {
-        Toast.show({
-          type: 'error',
-          text1: 'Error',
-          text2: 'No user found with this email.',
-        });
-      } else if (error.code === 'auth/wrong-password') {
-        Toast.show({
-          type: 'error',
-          text1: 'Error',
-          text2: 'Incorrect password. Please try again.',
-        });
-      } else {
-        Toast.show({
-          type: 'error',
-          text1: 'Error',
-          text2: error.message,
-        });
-      }
-    } finally {
-      setLoading(false);
-    }
+  const handleCharacterPress = (character) => {
+    navigation.navigate('ChatScreen', {
+      id: character.id,
+      name: character.name,
+      description: character.description,
+      image: character.image,
+    });
   };
-
-  const handleGoogleSignIn = async () => {
-    try {
-      // Ensure Google Play services are available
-      await GoogleSignin.hasPlayServices();
-      
-      // Sign in with Google
-      const { idToken } = await GoogleSignin.signIn();
-      
-      // Create a Google credential with the token
-      const googleCredential = auth.GoogleAuthProvider.credential(idToken);
-      
-      // Sign in with Firebase using the Google credential
-      await auth().signInWithCredential(googleCredential);
   
-      // On success, navigate and show a success message
-      Toast.show({
-        type: 'success',
-        text1: 'Google Sign-In Successful!',
-        text2: 'Welcome!',
-      });
-      navigation.navigate('Home');
-    } catch (error) {
-      console.log(error)
-      Toast.show({
-        type: 'error',
-        text1: 'Google Sign-In Failed',
-        text2: error.message || 'An error occurred. Please try again.',
-      });
-    }
-  };
 
   return (
-    <LinearGradient colors={['#151515', '#17435D']} style={styles.container}>
-      {/* Logo */}
-      <Image source={require('../assets/logo-rolevia.png')} style={styles.logo} />
+    <LinearGradient colors={['#3C4D57', '#82A7BD']} style={styles.linearGradient}>
+      <ScrollView contentContainerStyle={styles.container}>
+        {/* Trending Section */}
+        <LinearGradient colors={['#17435D', '#16191B']} style={styles.trendingSection}>
+          <Text style={styles.trendingTitle}>Trending</Text>
+          <Text style={styles.trendingSubtitle}>Trending characters</Text>
+          <View style={styles.characterGrid}>
+            {trendingCharacters.map((character) => (
+              <TouchableOpacity
+                key={character.id}
+                onPress={() => handleCharacterPress(character)}
+                style={styles.characterTouchable}
+              >
+                <Image
+                  source={character.image}
+                  style={styles.characterImage}
+                  accessibilityLabel={`Trending character ${character.name}`}
+                />
+              </TouchableOpacity>
+            ))}
+          </View>
+        </LinearGradient>
 
-      {/* Input Fields */}
-      <View style={styles.inputContainer}>
-        <TextInput
-          placeholder="Email"
-          placeholderTextColor="#999"
-          style={styles.input}
-          value={email}
-          onChangeText={(text) => setEmail(text)}
-        />
-        <TextInput
-          placeholder="Password"
-          placeholderTextColor="#999"
-          secureTextEntry={true}
-          style={styles.input}
-          value={password}
-          onChangeText={(text) => setPassword(text)}
-        />
-        <TouchableOpacity
-          style={[styles.button, { backgroundColor: '#82A7BD' }]}
-          onPress={handleLogin}
-        >
-          {loading ? (
-            <ActivityIndicator color="#FFF" />
-          ) : (
-            <Text style={styles.buttonText}>Login</Text>
-          )}
-        </TouchableOpacity>
-      </View>
+        {/* Character List Section */}
+        <View style={styles.characterList}>
+          {characterList.map((character) => (
+            <TouchableOpacity
+              key={character.id}
+              onPress={() => handleCharacterPress(character)}
+              style={styles.characterItem}
+            >
+              <View style={styles.characterTextContainer}>
+                <Text style={styles.characterName}>{character.name}</Text>
+                <Text style={styles.characterDescription}>{character.description}</Text>
+              </View>
+              <Image
+                source={character.image}
+                style={styles.characterIcon}
+                accessibilityLabel={`Character ${character.name}`}
+              />
+            </TouchableOpacity>
+          ))}
+        </View>
+      </ScrollView>
 
-      {/* Connect With Google and Facebook */}
-      <Text style={styles.connectText}>Or connect with</Text>
-      <View style={styles.socialContainer}>
-        <TouchableOpacity style={[styles.socialButton, { backgroundColor: '#D44638' }]} onPress={handleGoogleSignIn}>
-          <Text style={styles.socialText}>Google</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.socialButton, { backgroundColor: '#4267B2' }]}>
-          <Text style={styles.socialText}>Facebook</Text>
-        </TouchableOpacity>
-      </View>
+      {/* Bottom Tab Bar */}
+      <LinearGradient
+        colors={['#323142', '#82A7BD']}
+        style={styles.tabBar}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+      >
+        {[{ icon: 'home', label: 'Home' }, { icon: 'compass', label: 'Explore' }, { icon: 'chat', label: 'Chat History' }, { icon: 'account', label: 'Profile' }].map((tab, index) => (
+          <TouchableOpacity key={index} style={styles.tabItem} accessibilityLabel={`Tab: ${tab.label}`}>
+            <Icon name={tab.icon} size={30} color="#fff" />
+            <Text style={styles.tabLabel}>{tab.label}</Text>
+          </TouchableOpacity>
+        ))}
+      </LinearGradient>
     </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+  container: { flexGrow: 1, paddingBottom: 20 },
+  linearGradient: { flex: 1 },
+  trendingSection: {
+    padding: 20,
+    marginHorizontal: 30,
+    marginTop: 70,
+    borderRadius: 12,
+    height: 367,
+    elevation: 10,
+    shadowColor: '#092332',
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 3 },
   },
-  logo: {
-    width: 150,
-    height: 150,
-    marginBottom: 30,
-  },
-  inputContainer: {
-    width: '80%',
-    marginBottom: 20,
-  },
-  input: {
-    width: '100%',
-    height: 50,
-    backgroundColor: '#17435D',
-    borderRadius: 8,
-    paddingHorizontal: 15,
-    color: '#FFF',
-    marginBottom: 15,
-    fontSize: 16,
-  },
-  connectText: {
-    color: '#FFF',
-    fontSize: 16,
-    marginVertical: 10,
-  },
-  socialContainer: {
+  trendingTitle: { fontSize: 24, color: '#fff', fontWeight: 'bold' },
+  trendingSubtitle: { fontSize: 16, color: 'white', marginBottom: 10, fontWeight: '300' },
+  characterGrid: { flexDirection: 'row', flexWrap: 'wrap' },
+  characterTouchable: { width: '50%', padding: 5 },
+  characterImage: { width: '100%', height: 130, borderRadius: 10, resizeMode: 'contain' },
+  characterList: { padding: 20 },
+  characterItem: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    width: '80%',
-    marginTop: 10,
+    marginBottom: 20,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    elevation: 5,
+    shadowColor: '#000000',
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 3 },
   },
-  socialButton: {
-    flex: 1,
-    paddingVertical: 12,
-    marginHorizontal: 10,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  socialText: {
-    color: '#FFF',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  button: {
-    width: '100%',
-    height: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 8,
-    marginBottom: 15,
-  },
-  buttonText: {
-    color: '#FFF',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
+  characterTextContainer: { paddingLeft: 20 },
+  characterIcon: { width: 100, height: 81, borderTopRightRadius: 10, borderBottomRightRadius: 10 },
+  characterName: { fontSize: 18, fontWeight: 'bold', color: 'black' },
+  characterDescription: { fontSize: 14, color: '#888' },
+  tabBar: { height: 70, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around' },
+  tabItem: { alignItems: 'center', justifyContent: 'center' },
+  tabLabel: { fontSize: 12, color: '#fff', marginTop: 5 },
 });
 
-export default LoginScreen;
+export default Home;
