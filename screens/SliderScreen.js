@@ -1,21 +1,23 @@
+import { useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 
 const SliderScreen = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const navigation= useNavigation()
 
   const images = [
     { 
-      src: require('./assets/img1.png'), 
+      src: require('../assets/img1.png'), 
       title: 'Unlock the Power\nOf Future AI' 
     },
     { 
-      src: require('./assets/img2.png'), 
+      src: require('../assets/img2.png'), 
       title: 'Chat With Your\nFavourite AI' 
     },
     { 
-      src: require('./assets/img3.png'), 
+      src: require('../assets/img3.png'), 
       title: 'Boost Your Mind\nPower with AI' 
     },
   ];
@@ -44,7 +46,7 @@ const SliderScreen = () => {
       style={styles.container}
     >
       {/* Skip Button */}
-      <TouchableOpacity style={styles.skipButton}>
+      <TouchableOpacity style={styles.skipButton} onPress={()=>{navigation.navigate('ChooseLogin')}}>
         <Text style={styles.skipText}>Skip</Text>
       </TouchableOpacity>
 
@@ -165,4 +167,3 @@ const styles = StyleSheet.create({
 });
 
 export default SliderScreen;
-
